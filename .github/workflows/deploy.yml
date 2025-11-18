@@ -51,7 +51,7 @@ jobs:
             echo "🔄 Gateway 배포 시작..."
             
             # 네트워크 보장
-            docker network create my-network || true
+            docker network create team3-network || true
             
             # 기존 컨테이너 정리 (이름: gateway)
             if [ "$(docker ps -aq -f name=gateway)" ]; then
@@ -69,7 +69,7 @@ jobs:
             docker run -d \
               -p 10443:8080 \
               --name gateway \
-              --network my-network \
+              --network team3-network \
               --restart unless-stopped \
               -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE="http://eureka:8761/eureka/" \
               ${{ secrets.DOCKER_USERNAME }}/gateway:latest
