@@ -10,6 +10,11 @@ spring:
         locator:
           enabled: true # Eureka\uC5D0 \uB4F1\uB85D\uB41C \uC11C\uBE44\uC2A4\uB4E4\uC744 \uC790\uB3D9\uC73C\uB85C \uB77C\uC6B0\uD305 (http://gateway/shop-service/...)
           lower-case-service-id: true
+      routes:
+        - id: coupon
+          uri: lb://COUPON
+          predicates:
+            - Path=/hello/**
 
 eureka:
   client:
