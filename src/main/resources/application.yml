@@ -14,7 +14,7 @@ spring:
         - id: coupon
           uri: lb://COUPON
           predicates:
-            - Path=/hello/**
+            - Path=/coupons/**
 
 eureka:
   client:
