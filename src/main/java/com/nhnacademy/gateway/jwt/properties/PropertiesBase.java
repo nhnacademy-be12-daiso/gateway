@@ -10,21 +10,7 @@
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
-package com.nhnacademy.gateway;
+package com.nhnacademy.gateway.jwt.properties;
 
-import com.nhnacademy.gateway.jwt.properties.PropertiesBase;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-
-@SpringBootApplication
-@ConfigurationPropertiesScan(basePackageClasses = {PropertiesBase.class})   // 해당 클래스가 있는 패키지 기준으로 스캔
-@EnableDiscoveryClient
-public class GatewayApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
-    }
-
+public interface PropertiesBase {   // UserApplication.java에서 해당 패키지(properties)를 자동으로 스프링 빈으로 등록되게 도와줌
 }
