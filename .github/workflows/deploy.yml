@@ -50,9 +50,12 @@ jobs:
             
             echo "Gateway 배포 시작 (Compose Integration)..."
             
-            docker pull ${{ secrets.DOCKER_USERNAME }}/gateway:latest
+            export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
+            export DOCKER_PASSWORD="${{ secrets.DOCKER_PASSWORD }}"
 
             cd ~/infra
+            
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
             docker compose --env-file .env up -d --no-deps --force-recreate gateway
             
