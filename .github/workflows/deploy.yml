@@ -1,4 +1,4 @@
-name: Gateway - Build and Deploy
+name: Gateway - Build and Deploy (Compose)
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/gateway:latest
 
-      - name: Deploy to Server
+      - name: Deploy to Server (Docker Compose Orchestration)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -48,30 +48,12 @@ jobs:
           script: |
             set -e
             
-            echo "🔄 Gateway 배포 시작..."
+            echo "Gateway 배포 시작 (Compose Integration)..."
             
-            # 네트워크 보장
-            docker network create team3-network || true
-            
-            # 기존 컨테이너 정리 (이름: gateway)
-            if [ "$(docker ps -aq -f name=gateway)" ]; then
-                echo "🧹 기존 Gateway 컨테이너 삭제..."
-                docker rm -f gateway
-            fi
-            
-            # 이미지 Pull
             docker pull ${{ secrets.DOCKER_USERNAME }}/gateway:latest
+
+            cd ~/infra
+
+            docker compose --env-file .env up -d --no-deps --force-recreate gateway
             
-            # ★ Gateway 실행
-            # - 포트: 10443 (외부) -> 8080 (내부)
-            # - 이름: gateway
-            # - Eureka 주소: 환경변수로 강제 주입 (안전장치)
-            docker run -d \
-              -p 10443:8080 \
-              --name gateway \
-              --network team3-network \
-              --restart unless-stopped \
-              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE="http://eureka:8761/eureka/" \
-              ${{ secrets.DOCKER_USERNAME }}/gateway:latest
-            
-            echo "🚀 Gateway 실행 완료!"
+            echo "Gateway 실행 완료!"
