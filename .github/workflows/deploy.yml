@@ -36,7 +36,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/gateway:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/team3-gateway:latest
 
       - name: Deploy to Server (Docker Compose Orchestration)
         uses: appleboy/ssh-action@master
