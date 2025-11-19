@@ -19,7 +19,8 @@ eureka:
     fetch-registry: true
     service-url:
       # \u2605 Eureka \uCEE8\uD14C\uC774\uB108 \uC774\uB984\uC774 'eureka'\uC774\uBBC0\uB85C \uC544\uB798\uC640 \uAC19\uC774 \uC124\uC815
-      defaultZone: http://eureka:8761/eureka/
+      # defaultZone: http://eureka:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 jwt:
   secret: b4a59df482427d24ebaf9c86c76260fbfb48ddf0d72079f8666a2419b1aa51c0
@@ -27,3 +28,6 @@ jwt:
   token-prefix: Daiso
   header: Authorization
   login-url: /users/login
+  
+server:
+  port: 8082
