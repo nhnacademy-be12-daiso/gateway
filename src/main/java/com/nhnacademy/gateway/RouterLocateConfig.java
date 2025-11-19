@@ -13,6 +13,9 @@ public class RouterLocateConfig {
         return builder.routes()
                 .route("coupon",
                         p->p.path("/coupons/**").and()
-                                .uri("lb://COUPON")).build();
+                                .uri("lb://COUPON"))
+                .route("shop-service",
+                p->p.path("/shop-service/**").and()
+                        .uri("lb://SHOP-SERVICE")).build();
     }
 }
