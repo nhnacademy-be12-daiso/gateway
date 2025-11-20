@@ -1,3 +1,6 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: gateway # \u2605 Eureka\uC5D0 \uB300\uBB38\uC790 'GATEWAY'\uB85C \uB4F1\uB85D\uB429\uB2C8\uB2E4.
@@ -19,4 +22,5 @@ eureka:
     fetch-registry: true
     service-url:
       # \u2605 Eureka \uCEE8\uD14C\uC774\uB108 \uC774\uB984\uC774 'eureka'\uC774\uBBC0\uB85C \uC544\uB798\uC640 \uAC19\uC774 \uC124\uC815
-      defaultZone: http://eureka:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
+      #defaultZone: http://eureka:8761/eureka/

@@ -1,3 +1,15 @@
+/*
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + Copyright 2025. NHN Academy Corp. All rights reserved.
+ * + * While every precaution has been taken in the preparation of this resource,  assumes no
+ * + responsibility for errors or omissions, or for damages resulting from the use of the information
+ * + contained herein
+ * + No part of this resource may be reproduced, stored in a retrieval system, or transmitted, in any
+ * + form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the
+ * + prior written permission.
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
+
 package com.nhnacademy.gateway;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -9,13 +21,17 @@ import org.springframework.context.annotation.Configuration;
 public class RouterLocateConfig {
 
     @Bean
-    public RouteLocator myRoute(RouteLocatorBuilder builder){
+    public RouteLocator myRoute(RouteLocatorBuilder builder) {
         return builder.routes()
+                .route("auth",
+                        p -> p.path("/signup").and()
+                                .uri("lb://USER"))
+                .route("user-service",
+                        p -> p.path("/users/**").and()
+                                .uri("lb:USER"))
                 .route("coupon",
-                        p->p.path("/coupons/**").and()
+                        p -> p.path("/coupons/**").and()
                                 .uri("lb://COUPON"))
-                .route("shop-service",
-                p->p.path("/shop-service/**").and()
-                        .uri("lb://SHOP-SERVICE")).build();
+                .build();
     }
 }
