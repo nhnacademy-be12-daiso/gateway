@@ -1,6 +1,6 @@
 spring:
   application:
-    name: gateway # \u2605 Eureka\uC5D0 \uB300\uBB38\uC790 'GATEWAY'\uB85C \uB4F1\uB85D\uB429\uB2C8\uB2E4.
+    name: team3-gateway # \u2605 Eureka\uC5D0 \uB300\uBB38\uC790 'GATEWAY'\uB85C \uB4F1\uB85D\uB429\uB2C8\uB2E4.
 #  cloud:
 #    gateway:
 #      discovery:
@@ -13,10 +13,24 @@ spring:
 #          predicates:
 #            - Path=/coupons/**
 
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+                    - id: auth-service
+                      uri: lb://TEAM3-AUTH
+                      predicates:
+                        - Path=/auth/**
+
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
       # \u2605 Eureka \uCEE8\uD14C\uC774\uB108 \uC774\uB984\uC774 'eureka'\uC774\uBBC0\uB85C \uC544\uB798\uC640 \uAC19\uC774 \uC124\uC815
-      defaultZone: http://eureka:8761/eureka/
+      defaultZone: http://team3-eureka:8761/eureka/
