@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: team3-gateway
@@ -10,11 +13,11 @@ spring:
             locator:
               enabled: true
               lower-case-service-id: true
-          routes:
-                    - id: auth-route
-                      uri: lb://TEAM3-AUTH
-                      predicates:
-                        - Path=/auth/**
+#          routes:
+#                    - id: auth-route
+#                      uri: lb://TEAM3-AUTH
+#                      predicates:
+#                        - Path=/auth/**
 
 #                    - id: coupon-route
 #                      uri: lb://TEAM3-COUPON

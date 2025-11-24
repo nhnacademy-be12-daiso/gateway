@@ -5,17 +5,22 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// @Configuration
+@Configuration
 public class RouterLocateConfig {
 
     @Bean
     public RouteLocator myRoute(RouteLocatorBuilder builder){
         return builder.routes()
-                .route("coupon",
-                        p->p.path("/coupons/**").and()
-                                .uri("lb://COUPON"))
-                .route("shop-service",
-                p->p.path("/shop-service/**").and()
-                        .uri("lb://SHOP-SERVICE")).build();
+                .route("team3-auth",
+                        p->p.path("/auth/**")
+                        .uri("lb://TEAM3-AUTH")).build();
+
+
+//                .route("coupon",
+//                p->p.path("/coupons/**")
+//                        .uri("lb://COUPON"))
+//                .route("shop-service",
+//                        p->p.path("/shop-service/**")
+//                                .uri("lb://SHOP-SERVICE"))
     }
 }
