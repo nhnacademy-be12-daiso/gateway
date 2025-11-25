@@ -38,7 +38,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/team3-gateway:latest
 
-      - name: Deploy to Server (Docker Compose Orchestration)
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -48,15 +48,21 @@ jobs:
           script: |
             set -e
             
-            echo "Gateway 배포 시작 (Compose Integration)..."
-            
             export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
             export DOCKER_PASSWORD="${{ secrets.DOCKER_PASSWORD }}"
-
             cd ~/infra
             
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
             docker compose --env-file .env up -d --no-deps --force-recreate team3-gateway
             
-            echo "Gateway 실행 완료!"
+            for retry in {1..30}; do
+              if docker exec team3-gateway curl -s http://localhost:8080/actuator/health | grep -q "UP"; then
+                  echo "Gateway UP"
+                  break
+              fi
+              sleep 3
+              if [ $retry -eq 30 ]; then
+                exit 1
+              fi
+            done
