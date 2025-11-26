@@ -16,9 +16,11 @@ import com.nhnacademy.gateway.jwt.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.security.Key;
 import java.util.Date;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
@@ -26,10 +28,10 @@ public class JwtUtil {
     // JWT 서명에 사용할 비밀키
     private final Key key;
 
-    // 토큰 만료 시간
+    @Value("${jwt.access-token-expiration}")
     private final long expirationTime;
 
-    // 토큰 앞에 붙는 접두사 (현재: Daiso)
+    @Value("${jwt.token-prefix}")
     private final String tokenPrefix;
 
     public JwtUtil(JwtProperties jwtProperties) {
