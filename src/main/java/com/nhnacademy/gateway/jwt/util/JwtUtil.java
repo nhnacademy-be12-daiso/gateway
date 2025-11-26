@@ -16,9 +16,9 @@ import com.nhnacademy.gateway.jwt.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -28,27 +28,22 @@ public class JwtUtil {
     // JWT 서명에 사용할 비밀키
     private final Key key;
 
-    @Value("${jwt.access-token-expiration}")
-    private final long expirationTime;
-
-    @Value("${jwt.token-prefix}")
-    private final String tokenPrefix;
-
     public JwtUtil(JwtProperties jwtProperties) {
+        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes)");
+        }
         // 비밀키를 HMAC SHA 알고리즘용 Key 객체로 변환
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
-        // 초 단위로 설정되어 있는 expirationTime을 ms 단위로 변환
-        this.expirationTime = jwtProperties.getExpirationTime() * 1000L;
-        this.tokenPrefix = jwtProperties.getTokenPrefix();
     }
 
     // 토큰에서 Claims(payload 부분의 데이터 == 토큰에 담긴 정보) 추출 (내부용)
     private Claims parseClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(key)
+                .verifyWith((javax.crypto.SecretKey) key)
                 .build()
-                .parseClaimsJws(token)  // JWS 서명을 검증하면서 Claims 추출
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     // 토큰 유효성 검증: 서명 검증 + 만료 여부
@@ -83,7 +78,7 @@ public class JwtUtil {
             return expirationTime - now;
 
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
     }
 

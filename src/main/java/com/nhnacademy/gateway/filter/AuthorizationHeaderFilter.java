@@ -14,7 +14,6 @@ package com.nhnacademy.gateway.filter;
 
 import com.nhnacademy.gateway.jwt.properties.JwtProperties;
 import com.nhnacademy.gateway.jwt.util.JwtUtil;
-import java.util.Objects;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -62,8 +61,10 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 return onError(exchange, "No Authorization header", HttpStatus.UNAUTHORIZED);
             }
 
-            String authorizationHeader = Objects.requireNonNull(
-                    request.getHeaders().get(HttpHeaders.AUTHORIZATION)).getFirst();
+            String authorizationHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            if (authorizationHeader == null || authorizationHeader.trim().isEmpty()) {
+                return onError(exchange, "No Authorization header", HttpStatus.UNAUTHORIZED);
+            }
             String token = authorizationHeader.replace(jwtProperties.getTokenPrefix() + " ", "");
 
             // Redis 블랙리스트 확인
