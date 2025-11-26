@@ -28,35 +28,16 @@ public class RouterLocateConfig {
     @Bean
     public RouteLocator myRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("user-public",
-                        p -> p.path("/users/signup", "/users/login", "/users/verify/**", "/users/check/**")
-                                .uri("lb://TEAM3-USER"))
-
-                .route("user-protected",
-                        p -> p.path("/users/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
-                                .uri("lb://TEAM3-USER"))
-
-                .route("coupon-public",
-                        p -> p.path("/coupons/welcome/**")
+                .route("team3-auth",
+                        p->p.path("/auth/**").and()
+                        .uri("lb://TEAM3-AUTH"))
+                .route("team3-coupon",
+                        p -> p.path("/api/coupons/**").and()
                                 .uri("lb://TEAM3-COUPON"))
-
-                .route("coupon-protected",
-                        p -> p.path("/coupons/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
-                                .uri("lb://TEAM3-COUPON"))
-
-                .route("order-payment",
-                        p -> p.path("/order-payment/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
-                                .uri("lb://TEAM3-ORDER-PAYMENT"))
-
-                .route("books-search",
-                        p -> p.path("/books/**")
-                                .uri("lb://TEAM3-BOOKSEARCH"))
+                .route("team3-user",
+                        p -> p.path("/api/users/**").and()
+                                .uri("lb://TEAM3-USER"))
                 .build();
+
     }
 }

@@ -1,33 +1,45 @@
 spring:
   application:
-    name: gateway # \u2605 Eureka\uC5D0 \uB300\uBB38\uC790 'GATEWAY'\uB85C \uB4F1\uB85D\uB429\uB2C8\uB2E4.
-#  cloud:
-#    gateway:
-#      discovery:
-#        locator:
-#          enabled: true # Eureka\uC5D0 \uB4F1\uB85D\uB41C \uC11C\uBE44\uC2A4\uB4E4\uC744 \uC790\uB3D9\uC73C\uB85C \uB77C\uC6B0\uD305 (http://gateway/shop-service/...)
-#          lower-case-service-id: true
-#      routes:
-#        - id: coupon
-#          uri: lb://COUPON
-#          predicates:
-#            - Path=/coupons/**
+    name: team3-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+#          routes:
+#                    - id: auth-route
+#                      uri: lb://TEAM3-AUTH
+#                      predicates:
+#                        - Path=/auth/**
+
+#                    - id: coupon-route
+#                      uri: lb://TEAM3-COUPON
+#                      predicates:
+#                        - Path=/coupons/**
+#
+#                    - id: shop-route
+#                      uri: lb://SHOP-SERVICE
+#                      predicates:
+#                        - Path=/shop-service/**
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      # \u2605 Eureka \uCEE8\uD14C\uC774\uB108 \uC774\uB984\uC774 'eureka'\uC774\uBBC0\uB85C \uC544\uB798\uC640 \uAC19\uC774 \uC124\uC815
-      # defaultZone: http://eureka:8761/eureka/
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
 
-jwt:
-  secret: b4a59df482427d24ebaf9c86c76260fbfb48ddf0d72079f8666a2419b1aa51c0
-  expiration-time: 3600
-  token-prefix: Daiso
-  header: Authorization
-  login-url: /users/login
-  
-server:
-  port: 8082
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
