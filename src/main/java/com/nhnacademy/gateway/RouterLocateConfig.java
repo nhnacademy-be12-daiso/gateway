@@ -28,17 +28,35 @@ public class RouterLocateConfig {
     @Bean
     public RouteLocator myRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("public-service",
-                        p -> p.path("/users/**").and()
-                                .uri("lb://USER"))
-                .route("coupon",
-                        p -> p.path("/coupons/**").and()
-                                .uri("lb://COUPON"))
-                .route("shop-service",
-                        p -> p.path("/shop-service/**")
+                .route("user-public",
+                        p -> p.path("/users/signup", "/users/login", "/users/verify/**", "/users/check/**")
+                                .uri("lb://TEAM3-USER"))
+
+                .route("user-protected",
+                        p -> p.path("/users/**")
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
-                                .uri("lb://SHOP-SERVICE"))
+                                .uri("lb://TEAM3-USER"))
+
+                .route("coupon-public",
+                        p -> p.path("/coupons/welcome/**")
+                                .uri("lb://TEAM3-COUPON"))
+
+                .route("coupon-protected",
+                        p -> p.path("/coupons/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
+                                .uri("lb://TEAM3-COUPON"))
+
+                .route("order-payment",
+                        p -> p.path("/order-payment/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
+                                .uri("lb://TEAM3-ORDER-PAYMENT"))
+
+                .route("books-search",
+                        p -> p.path("/books/**")
+                                .uri("lb://TEAM3-BOOKSEARCH"))
                 .build();
     }
 }
