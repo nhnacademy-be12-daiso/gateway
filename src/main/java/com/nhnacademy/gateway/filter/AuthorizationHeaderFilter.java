@@ -58,31 +58,48 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             // GatewayFilterChain = 다음 필터로 넘기라고 알려주는 역할
             ServerHttpRequest request = exchange.getRequest();
 
+            log.info("========================================");
+            log.info("[Gateway Filter] 요청 경로: {} {}", request.getMethod(), request.getPath());
+            log.info("========================================");
+
             // 헤더 포함 여부 확인
             if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                log.warn("[Gateway Filter] Authorization 헤더가 없습니다.");
                 return onError(exchange, "No Authorization header", HttpStatus.UNAUTHORIZED);
             }
 
             String authorizationHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             if (authorizationHeader == null || authorizationHeader.trim().isEmpty()) {
+                log.warn("[Gateway Filter] Authorization 헤더가 비어있습니다.");
                 return onError(exchange, "No Authorization header", HttpStatus.UNAUTHORIZED);
             }
+
+            log.info("[Gateway Filter] Authorization 헤더: {}", authorizationHeader.substring(0, Math.min(20, authorizationHeader.length())) + "...");
             String token = authorizationHeader.replace(jwtProperties.getTokenPrefix() + " ", "");
+            log.info("[Gateway Filter] 토큰 추출 완료 (길이: {})", token.length());
 
             // Redis 블랙리스트 확인 (Auth Server와 동일한 키 형식 사용)
-            String isLogout = stringRedisTemplate.opsForValue().get("blacklist:" + token);
+            String blacklistKey = "blacklist:" + token;
+            String isLogout = stringRedisTemplate.opsForValue().get(blacklistKey);
+            log.info("[Gateway Filter] Redis 블랙리스트 확인: key={}, result={}", blacklistKey.substring(0, Math.min(30, blacklistKey.length())) + "...", isLogout);
 
             if (isLogout != null && isLogout.equals("logout")) {
+                log.warn("[Gateway Filter] 블랙리스트에 등록된 토큰입니다.");
                 return onError(exchange, "Token is in blacklist", HttpStatus.UNAUTHORIZED);
             }
 
             // 토큰 유효성 검증, Claims 추출
             if (!jwtUtil.isTokenValid(token)) {
+                log.error("[Gateway Filter] JWT 토큰이 유효하지 않습니다.");
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
+            log.info("[Gateway Filter] JWT 토큰 검증 성공");
+
             String userId = jwtUtil.getLoginId(token);
             String role = jwtUtil.getRole(token);
+
+            log.info("[Gateway Filter] Claims 추출 완료 - userId: {}, role: {}", userId, role);
 
             // WebFlux의 요청 객체는 불변이므로 직접 수정 불가
             // 대신 mutate()를 써서 헤더가 추가된 복제본을 새로 생성
@@ -90,6 +107,12 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     .header("X-User-Id", userId)    // API들한테 넘겨줄 ID
                     .header("X-Role", role)         // API들한테 넘겨줄 권한
                     .build();
+
+            log.info("[Gateway Filter] 헤더 추가 완료");
+            log.info("[Gateway Filter]   - X-User-Id: {}", userId);
+            log.info("[Gateway Filter]   - X-Role: {}", role);
+            log.info("[Gateway Filter] MSA 서비스로 요청 전달: {}", request.getPath());
+            log.info("========================================");
 
             // 다음 필터에게 넘어갈 때, 원본이 아니라 헤더가 추가된 복제본을 쥐어줌
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
