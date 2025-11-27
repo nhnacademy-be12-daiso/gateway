@@ -16,12 +16,14 @@ import com.nhnacademy.gateway.jwt.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -29,12 +31,20 @@ public class JwtUtil {
     private final Key key;
 
     public JwtUtil(JwtProperties jwtProperties) {
+        log.info("========================================");
+        log.info("[JwtUtil] Initializing with secret: {}...",
+                jwtProperties.getSecret() != null ? jwtProperties.getSecret().substring(0, Math.min(10, jwtProperties.getSecret().length())) + "..." : "NULL");
+        log.info("[JwtUtil] Token prefix: {}", jwtProperties.getTokenPrefix());
+        log.info("========================================");
+
         byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
         if (keyBytes.length < 32) {
             throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes)");
         }
         // 비밀키를 HMAC SHA 알고리즘용 Key 객체로 변환
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+
+        log.info("[JwtUtil] JWT Secret Key initialized successfully");
     }
 
     // 토큰에서 Claims(payload 부분의 데이터 == 토큰에 담긴 정보) 추출 (내부용)

@@ -16,7 +16,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
@@ -26,7 +25,6 @@ public class JwtProperties {
 
     // JWT 서명에 사용할 비밀 키
     @NotBlank
-    @Value("${JWT.SECRET}")
     private String secret;
 
     // 토큰 만료 시간
