@@ -15,12 +15,12 @@ package com.nhnacademy.gateway.jwt.util;
 import com.nhnacademy.gateway.jwt.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Slf4j
@@ -28,7 +28,7 @@ import java.util.Date;
 public class JwtUtil {
 
     // JWT 서명에 사용할 비밀키
-    private final Key key;
+    private final SecretKey key;
 
     public JwtUtil(JwtProperties jwtProperties) {
         log.info("========================================");
@@ -37,20 +37,20 @@ public class JwtUtil {
         log.info("[JwtUtil] Token prefix: {}", jwtProperties.getTokenPrefix());
         log.info("========================================");
 
-        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+        // Auth Server와 동일하게 Base64 디코딩 방식 사용
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
         if (keyBytes.length < 32) {
-            throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes)");
+            throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes) after Base64 decoding");
         }
-        // 비밀키를 HMAC SHA 알고리즘용 Key 객체로 변환
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        this.key = Keys.hmacShaKeyFor(keyBytes);
 
-        log.info("[JwtUtil] JWT Secret Key initialized successfully");
+        log.info("[JwtUtil] JWT Secret Key initialized successfully (Base64 decoded)");
     }
 
     // 토큰에서 Claims(payload 부분의 데이터 == 토큰에 담긴 정보) 추출 (내부용)
     private Claims parseClaims(String token) {
         return Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) key)
+                .verifyWith(key) // SecretKey로 서명 검증
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
