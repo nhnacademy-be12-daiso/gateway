@@ -67,8 +67,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             }
             String token = authorizationHeader.replace(jwtProperties.getTokenPrefix() + " ", "");
 
-            // Redis 블랙리스트 확인
-            String isLogout = stringRedisTemplate.opsForValue().get(token);
+            // Redis 블랙리스트 확인 (Auth Server와 동일한 키 형식 사용)
+            String isLogout = stringRedisTemplate.opsForValue().get("blacklist:" + token);
 
             if (isLogout != null && isLogout.equals("logout")) {
                 return onError(exchange, "Token is in blacklist", HttpStatus.UNAUTHORIZED);
@@ -85,8 +85,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             // WebFlux의 요청 객체는 불변이므로 직접 수정 불가
             // 대신 mutate()를 써서 헤더가 추가된 복제본을 새로 생성
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
-                    .header("X-USER-ID", userId)    // API들한테 넘겨줄 ID
-                    .header("X-ROLE", role)         // API들한테 넘겨줄 권한
+                    .header("X-User-Id", userId)    // API들한테 넘겨줄 ID
+                    .header("X-Role", role)         // API들한테 넘겨줄 권한
                     .build();
 
             // 다음 필터에게 넘어갈 때, 원본이 아니라 헤더가 추가된 복제본을 쥐어줌

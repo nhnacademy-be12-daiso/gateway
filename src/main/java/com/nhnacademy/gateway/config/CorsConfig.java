@@ -12,14 +12,15 @@
 
 package com.nhnacademy.gateway.config;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class CorsConfig {
@@ -40,8 +41,8 @@ public class CorsConfig {
 
         // 브라우저가 읽을 수 있게 허용할 응답 헤더
         corsConfig.addExposedHeader("Authorization");
-        corsConfig.addExposedHeader("X-USER-ID");
-        corsConfig.addExposedHeader("X-ROLE");
+        corsConfig.addExposedHeader("X-User-Id");
+        corsConfig.addExposedHeader("X-Role");
 
         // 이 설정을 모든 경로("/**")에 적용
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
