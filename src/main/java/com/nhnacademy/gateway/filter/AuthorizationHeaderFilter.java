@@ -52,30 +52,39 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     }
 
     @Override
-    public GatewayFilter apply(Config config) { // 딱 한 번 실행되어 실제 필터 로직(GatewayFilter)을 생성 후 반환
+    public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            // ServerWebExchange = HttpServletRequest + HttpServletResponse
-            // GatewayFilterChain = 다음 필터로 넘기라고 알려주는 역할
             ServerHttpRequest request = exchange.getRequest();
 
             log.info("========================================");
             log.info("[Gateway Filter] 요청 경로: {} {}", request.getMethod(), request.getPath());
             log.info("========================================");
 
-            // 헤더 포함 여부 확인
-            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                log.warn("[Gateway Filter] Authorization 헤더가 없습니다.");
-                return onError(exchange, "No Authorization header", HttpStatus.UNAUTHORIZED);
+            String token = null;
+
+            // 1. Authorization 헤더에서 토큰 확인 (기존 방식 - API 테스트용)
+            if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                String authorizationHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+                if (authorizationHeader != null && !authorizationHeader.trim().isEmpty()) {
+                    log.info("[Gateway Filter] Authorization 헤더에서 토큰 추출");
+                    token = authorizationHeader.replace(jwtProperties.getTokenPrefix() + " ", "");
+                }
             }
 
-            String authorizationHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-            if (authorizationHeader == null || authorizationHeader.trim().isEmpty()) {
-                log.warn("[Gateway Filter] Authorization 헤더가 비어있습니다.");
-                return onError(exchange, "No Authorization header", HttpStatus.UNAUTHORIZED);
+            // 2. Cookie에서 토큰 확인 (HttpOnly Cookie 방식)
+            if (token == null) {
+                token = extractTokenFromCookie(request, "accessToken");
+                if (token != null) {
+                    log.info("[Gateway Filter] Cookie에서 토큰 추출");
+                }
             }
 
-            log.info("[Gateway Filter] Authorization 헤더: {}", authorizationHeader.substring(0, Math.min(20, authorizationHeader.length())) + "...");
-            String token = authorizationHeader.replace(jwtProperties.getTokenPrefix() + " ", "");
+            // 토큰이 없으면 인증 실패
+            if (token == null || token.trim().isEmpty()) {
+                log.warn("[Gateway Filter] 토큰이 없습니다 (헤더 및 Cookie 모두 확인).");
+                return onError(exchange, "No token found", HttpStatus.UNAUTHORIZED);
+            }
+
             log.info("[Gateway Filter] 토큰 추출 완료 (길이: {})", token.length());
 
             // Redis 블랙리스트 확인 (Auth Server와 동일한 키 형식 사용)
@@ -121,8 +130,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
     // WebFlux 방식으로 에러 응답 처리
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
-        // Mono는 결과가 0개 또는 1개인 약속
-        // Mono<Void>는 반환할 데이터는 없고 작업이 끝났는지 알려주는 역할
         ServerHttpResponse response = exchange.getResponse();
 
         log.error("[Gateway Filter] 인증 실패: {} (상태 코드: {})", err, httpStatus);
@@ -130,8 +137,22 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
         response.setStatusCode(httpStatus);
 
-        // 더 이상 처리하지 말고 지금 당장 클라이언트에게 응답을 보내라는 의미
         return response.setComplete();
+    }
+
+    // Cookie에서 토큰 추출 헬퍼 메서드
+    private String extractTokenFromCookie(ServerHttpRequest request, String cookieName) {
+        request.getCookies();
+        if (request.getCookies().get(cookieName) == null) {
+            return null;
+        }
+
+        var cookies = request.getCookies().get(cookieName);
+        if (cookies != null && !cookies.isEmpty()) {
+            return cookies.getFirst().getValue();
+        }
+
+        return null;
     }
 
 }
