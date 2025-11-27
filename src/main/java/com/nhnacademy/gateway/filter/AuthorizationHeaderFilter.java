@@ -14,6 +14,7 @@ package com.nhnacademy.gateway.filter;
 
 import com.nhnacademy.gateway.jwt.properties.JwtProperties;
 import com.nhnacademy.gateway.jwt.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
     // Gateway 필터는 Factory를 만들어야만 스프링이 인식함
@@ -99,6 +101,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         // Mono는 결과가 0개 또는 1개인 약속
         // Mono<Void>는 반환할 데이터는 없고 작업이 끝났는지 알려주는 역할
         ServerHttpResponse response = exchange.getResponse();
+
+        log.error("[Gateway Filter] 인증 실패: {} (상태 코드: {})", err, httpStatus);
+        log.error("========================================");
 
         response.setStatusCode(httpStatus);
 
