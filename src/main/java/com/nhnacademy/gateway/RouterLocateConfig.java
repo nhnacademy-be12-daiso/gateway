@@ -41,8 +41,12 @@ public class RouterLocateConfig {
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
                                 .uri("lb://TEAM3-COUPON"))
 
+                .route("team3-order-payment-public",
+                        p -> p.path("/api/carts/**")
+                                .uri("lb://TEAM3-ORDER-PAYMENT"))
+
                 .route("team3-order-payment",
-                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**", "/api/carts/**")
+                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
                                 .uri("lb://TEAM3-ORDER-PAYMENT"))

@@ -1,0 +1,76 @@
+pring:
+  application:
+    name: team3-auth
+
+  datasource:
+    # docker-compose.yml의 SPRING_DATASOURCE_URL 값
+    url: jdbc:mysql://s4.java21.net:13306/project_be12_team3?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    # docker-compose.yml의 SPRING_DATASOURCE_USERNAME 값
+    username: project_be12_team3
+    # docker-compose.yml의 SPRING_DATASOURCE_PASSWORD 값
+    password: 'Vu52gc0i(mNxDJyI'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # 개발용
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true     # SQL 로그 보기
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  data:
+    redis:
+      # docker-compose.yml의 SPRING_DATA_REDIS_HOST 값
+      host: s4.java21.net
+      # docker-compose.yml의 SPRING_DATA_REDIS_PORT 값
+      port: 6379
+      # docker-compose.yml의 SPRING_DATA_REDIS_PASSWORD 값
+      password: '*N2vya7H@muDTwdNMR!'
+      # docker-compose.yml의 SPRING_DATA_REDIS_DATABASE 값
+      database: 370
+
+  rabbitmq:
+    # docker-compose.yml의 SPRING_RABBITMQ_HOST 값
+    host: s4.java21.net
+    # docker-compose.yml의 SPRING_RABBITMQ_PORT 값
+    port: 5672
+    # docker-compose.yml의 SPRING_RABBITMQ_USERNAME 값
+    username: admin
+    # docker-compose.yml의 SPRING_RABBITMQ_PASSWORD 값
+    password: 'nhnacademy123!'
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      # docker-compose.yml의 EUREKA_CLIENT_SERVICEURL_DEFAULTZONE 값
+      defaultZone: http://team3-eureka:8761/eureka/
+
+jwt:
+  # docker-compose.yml의 JWT_SECRET 값
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLXNlY3JldC1rZXktZ2VuZXJhdGVkLWJ5LWJhc2U2NC1lbmNvZGVyLXRlc3QtMTIzNDU2Nzg5MA==
+  # docker-compose.yml의 ACCESS_TOKEN_EXPIRATION 값
+  access-token-expiration: 3600000
+  # docker-compose.yml의 REFRESH_TOKEN_EXPIRATION 값
+  refresh-token-expiration: 1209600000
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

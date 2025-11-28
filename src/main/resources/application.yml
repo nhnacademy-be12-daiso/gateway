@@ -4,10 +4,14 @@ spring:
 
   data:
     redis:
-      host: ${SPRING_DATA_REDIS_HOST}
-      port: ${SPRING_DATA_REDIS_PORT}
-      password: ${SPRING_DATA_REDIS_PASSWORD}
-      database: ${SPRING_DATA_REDIS_DATABASE}
+      # docker-compose.yml의 SPRING_DATA_REDIS_HOST 값
+      host: s4.java21.net
+      # docker-compose.yml의 SPRING_DATA_REDIS_PORT 값
+      port: 6379
+      # docker-compose.yml의 SPRING_DATA_REDIS_PASSWORD 값
+      password: '*N2vya7H@muDTwdNMR!'
+      # docker-compose.yml의 SPRING_DATA_REDIS_DATABASE 값
+      database: 370
 
   cloud:
     gateway:
@@ -25,11 +29,12 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+#      defaultZone: http://team3-eureka:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 jwt:
-  secret: ${JWT_SECRET}
-  expiration-time: ${ACCESS_TOKEN_EXPIRATION}
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLXNlY3JldC1rZXktZ2VuZXJhdGVkLWJ5LWJhc2U2NC1lbmNvZGVyLXRlc3QtMTIzNDU2Nzg5MA==
+  expiration-time: 3600000
   token-prefix: Bearer
   header: Authorization
 
