@@ -87,7 +87,7 @@ class AuthorizationHeaderFilterTest {
         });
 
         // when
-        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config())
+        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
                 .filter(exchange, chain);
 
         // then
@@ -127,7 +127,7 @@ class AuthorizationHeaderFilterTest {
         });
 
         // when
-        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config())
+        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
                 .filter(exchange, chain);
 
         // then
@@ -146,7 +146,7 @@ class AuthorizationHeaderFilterTest {
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
         // when
-        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config())
+        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
                 .filter(exchange, chain);
 
         // then
@@ -171,7 +171,7 @@ class AuthorizationHeaderFilterTest {
         given(valueOperations.get("blacklist:" + VALID_TOKEN)).willReturn("logout");
 
         // when
-        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config())
+        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
                 .filter(exchange, chain);
 
         // then
@@ -197,7 +197,7 @@ class AuthorizationHeaderFilterTest {
         given(jwtUtil.isTokenValid(VALID_TOKEN)).willReturn(false);
 
         // when
-        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config())
+        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
                 .filter(exchange, chain);
 
         // then
@@ -242,7 +242,7 @@ class AuthorizationHeaderFilterTest {
         });
 
         // when
-        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config())
+        Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
                 .filter(exchange, chain);
 
         // then

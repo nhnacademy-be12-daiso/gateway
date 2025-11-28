@@ -1,15 +1,3 @@
-/*
- * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * + Copyright 2025. NHN Academy Corp. All rights reserved.
- * + * While every precaution has been taken in the preparation of this resource,  assumes no
- * + responsibility for errors or omissions, or for damages resulting from the use of the information
- * + contained herein
- * + No part of this resource may be reproduced, stored in a retrieval system, or transmitted, in any
- * + form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the
- * + prior written permission.
- * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- */
-
 package com.nhnacademy.gateway.filter;
 
 import com.nhnacademy.gateway.jwt.properties.JwtProperties;
@@ -46,9 +34,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
-    public static class Config {
-        // 설정 값이 필요하면 여기에 추가
-        // 특정 라우트마다 권한을 다르게 검사하고 싶을 때
+    public record Config(String role) {
     }
 
     @Override
