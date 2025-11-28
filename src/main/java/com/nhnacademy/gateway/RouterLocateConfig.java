@@ -23,13 +23,15 @@ public class RouterLocateConfig {
     @Bean
     public RouteLocator myRoute(RouteLocatorBuilder builder) {
         return builder.routes()
+                // 아무나 접속할 수 있음(로그인, 회원가입)
                 .route("team3-auth",
                         p -> p.path("/auth/**")
                                 .uri(AUTH_LB_URL))
-
                 .route("team3-user-public",
                         p -> p.path("/api/users/signup")
                                 .uri(USER_LB_URL))
+
+                // user
                 .route("team3-user-protected",
                         p -> p.path("/api/users/**")
                                 .filters(f -> f.filter(
@@ -41,17 +43,28 @@ public class RouterLocateConfig {
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
                                 .uri((USER_LB_URL))
                 )
-                .route("team3-coupon-protected",
+
+                // coupon
+                .route("team3-coupon-protected-admin",
+                        p -> p.path("/api/coupons/policies/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_ADMIN))
+                                ))
+                                .uri(COUPON_LB_URL))
+                .route("team3-coupon-public",
                         p -> p.path("/api/coupons/**")
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(COUPON_LB_URL))
+
+                // order-payment
                 .route("team3-order-payment",
                         p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**", "/api/carts/**")
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
+                // booksearch
                 .route("team3-booksearch",
                         p -> p.path("/api/books/**", "/api/search/**")
                                 .filters(f -> f.filter(
