@@ -42,7 +42,7 @@ public class RouterLocateConfig {
                                 .uri("lb://TEAM3-COUPON"))
 
                 .route("team3-order-payment",
-                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
+                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**", "/api/carts/**")
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
                                 .uri("lb://TEAM3-ORDER-PAYMENT"))
