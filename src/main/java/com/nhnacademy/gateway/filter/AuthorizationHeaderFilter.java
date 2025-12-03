@@ -66,9 +66,20 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 String userId = jwtUtil.getLoginId(token);
                 String userRole = jwtUtil.getRole(token);
 
+                // ROLE_ 접두사가 없으면 추가
+                if (userRole != null && !userRole.startsWith("ROLE_")) {
+                    userRole = "ROLE_" + userRole;
+                }
+
                 if (config.getRole() != null) {
-                    if (userRole == null || !userRole.equals(config.getRole())) {
-                        log.warn("[Gateway] 권한 부족: required={}, actual={}", config.getRole(), userRole);
+                    String requiredRole = config.getRole();
+                    // 요구되는 role에도 ROLE_ 접두사가 없으면 추가
+                    if (!requiredRole.startsWith("ROLE_")) {
+                        requiredRole = "ROLE_" + requiredRole;
+                    }
+
+                    if (userRole == null || !userRole.equals(requiredRole)) {
+                        log.warn("[Gateway] 권한 부족: required={}, actual={}", requiredRole, userRole);
                         return onError(exchange, "Forbidden: Insufficient permissions", HttpStatus.FORBIDDEN);
                     }
                 }
