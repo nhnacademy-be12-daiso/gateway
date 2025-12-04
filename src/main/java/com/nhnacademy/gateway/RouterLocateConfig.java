@@ -40,7 +40,8 @@ public class RouterLocateConfig {
                         p -> p.path("/auth/**")
                                 .uri(AUTH_LB_URL))
                 .route("team3-user-public",
-                        p -> p.path("/api/users/signup", "/api/users/find-id", "/api/users/find-password")
+                        p -> p.path("/api/users/signup", "/api/users/check-id",
+                                        "/api/users/find-id", "/api/users/find-password")
                                 .uri(USER_LB_URL))
 
                 // user
