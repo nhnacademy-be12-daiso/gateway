@@ -39,6 +39,10 @@ public class RouterLocateConfig {
                 .route("team3-auth",
                         p -> p.path("/auth/**")
                                 .uri(AUTH_LB_URL))
+                // Payco OAuth2 Callback
+                .route("team3-auth-payco-callback",
+                        p -> p.path("/login/oauth2/code/payco")
+                                .uri(AUTH_LB_URL))
                 .route("team3-user-public",
                         p -> p.path("/api/users/signup", "/api/users/check-id",
                                         "/api/users/find-id", "/api/users/find-password")
