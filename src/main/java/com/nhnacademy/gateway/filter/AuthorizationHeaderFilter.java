@@ -63,7 +63,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
                 }
 
-                String userId = jwtUtil.getLoginId(token);
+                String userId = jwtUtil.getUserId(token);
+                String loginId = jwtUtil.getLoginId(token);
                 String userRole = jwtUtil.getRole(token);
 
                 // ROLE_ 접두사가 없으면 추가
@@ -86,6 +87,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
                 ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                         .header("X-User-Id", userId)
+                        .header("X-Login-Id", loginId != null ? loginId : "")
                         .header("X-Role", userRole)
                         .build();
 
@@ -105,6 +107,14 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 return authHeader.replace(jwtProperties.getTokenPrefix() + " ", "");
             }
         }
+
+        if (request.getCookies().containsKey("accessToken")) {
+            org.springframework.http.HttpCookie cookie = request.getCookies().getFirst("accessToken");
+            if (cookie != null && !cookie.getValue().isEmpty()) {
+                return cookie.getValue();
+            }
+        }
+
         return null;
     }
 
