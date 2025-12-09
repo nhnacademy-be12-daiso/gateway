@@ -1,43 +1,43 @@
-#spring:
-#  application:
-#    name: team3-gateway
-#
-#  data:
-#    redis:
-#      host: ${SPRING_DATA_REDIS_HOST}
-#      port: ${SPRING_DATA_REDIS_PORT}
-#      password: ${SPRING_DATA_REDIS_PASSWORD}
-#      database: ${SPRING_DATA_REDIS_DATABASE}
-#
-#  cloud:
-#    gateway:
-#      server:
-#        webflux:
-#          discovery:
-#            locator:
-#              enabled: true
-#              lower-case-service-id: true
-#
-#eureka:
-#  instance:
-#    prefer-ip-address: true
-#  client:
-#    register-with-eureka: true
-#    fetch-registry: true
-#    service-url:
-#      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
-#
-#jwt:
-#  secret: ${JWT_SECRET}
-#  expiration-time: ${ACCESS_TOKEN_EXPIRATION}
-#  token-prefix: Bearer
-#  header: Authorization
-#
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: health
-#  endpoint:
-#    health:
-#      show-details: always
+spring:
+  application:
+    name: team3-gateway
+
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+      password: ${SPRING_DATA_REDIS_PASSWORD}
+      database: ${SPRING_DATA_REDIS_DATABASE}
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-time: ${ACCESS_TOKEN_EXPIRATION}
+  token-prefix: Bearer
+  header: Authorization
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
