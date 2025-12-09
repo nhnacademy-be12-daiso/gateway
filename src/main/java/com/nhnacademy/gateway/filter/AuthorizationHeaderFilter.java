@@ -79,7 +79,13 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                         requiredRole = "ROLE_" + requiredRole;
                     }
 
-                    if (userRole == null || !userRole.equals(requiredRole)) {
+                    // ADMIN은 USER 권한도 포함 (상위 권한)
+                    boolean hasPermission = userRole != null && (
+                            userRole.equals(requiredRole) ||
+                                    ("ROLE_ADMIN".equals(userRole) && "ROLE_USER".equals(requiredRole))
+                    );
+
+                    if (!hasPermission) {
                         log.warn("[Gateway] 권한 부족: required={}, actual={}", requiredRole, userRole);
                         return onError(exchange, "Forbidden: Insufficient permissions", HttpStatus.FORBIDDEN);
                     }
