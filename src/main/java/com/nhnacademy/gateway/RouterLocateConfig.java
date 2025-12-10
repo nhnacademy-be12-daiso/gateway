@@ -75,7 +75,7 @@ public class RouterLocateConfig {
                                 .uri(COUPON_LB_URL))
 
                 .route("team3-order-payment-public",
-                        p -> p.path("/api/carts/**")
+                        p -> p.path("/api/carts/**", "/api/orders/prepare")
                                 .uri("lb://TEAM3-ORDER-PAYMENT"))
 
                 // order-payment
