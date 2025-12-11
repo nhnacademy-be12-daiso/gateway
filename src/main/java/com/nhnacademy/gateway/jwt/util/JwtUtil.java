@@ -68,9 +68,14 @@ public class JwtUtil {
         }
     }
 
+    // 토큰에서 사용자 ID(userCreatedId) 추출
+    public String getUserId(String token) {
+        return parseClaims(token).getSubject();
+    }
+
     // 토큰에서 로그인 ID 추출
     public String getLoginId(String token) {
-        return parseClaims(token).getSubject();
+        return parseClaims(token).get("loginId", String.class);
     }
 
     // 토큰에서 권한 추출

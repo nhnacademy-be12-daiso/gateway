@@ -1,3 +1,15 @@
+/*
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + Copyright 2025. NHN Academy Corp. All rights reserved.
+ * + * While every precaution has been taken in the preparation of this resource,  assumes no
+ * + responsibility for errors or omissions, or for damages resulting from the use of the information
+ * + contained herein
+ * + No part of this resource may be reproduced, stored in a retrieval system, or transmitted, in any
+ * + form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the
+ * + prior written permission.
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
+
 package com.nhnacademy.gateway;
 
 import com.nhnacademy.gateway.filter.AuthorizationHeaderFilter;
@@ -28,19 +40,22 @@ public class RouterLocateConfig {
                         p -> p.path("/auth/**")
                                 .uri(AUTH_LB_URL))
                 .route("team3-user-public",
-                        p -> p.path("/api/users/signup")
+                        p -> p.path("/api/users/signup", "/api/users/check-id",
+                                        "/api/users/find-id", "/api/users/find-password")
                                 .uri(USER_LB_URL))
 
                 // user
                 .route("team3-user-protected",
                         p -> p.path("/api/users/**")
                                 .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(USER_LB_URL))
                 .route("team3-user-admin",
                         p -> p.path("/api/admin/**")
                                 .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
                                 .uri((USER_LB_URL))
                 )
 
@@ -48,27 +63,34 @@ public class RouterLocateConfig {
                 .route("team3-coupon-protected-admin",
                         p -> p.path("/api/coupons/policies/**")
                                 .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_ADMIN))
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))
                                 ))
                                 .uri(COUPON_LB_URL))
                 .route("team3-coupon-public",
                         p -> p.path("/api/coupons/**")
                                 .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(COUPON_LB_URL))
+
+                .route("team3-order-payment-public",
+                        p -> p.path("/api/carts/**", "/api/orders/prepare")
+                                .uri("lb://TEAM3-ORDER-PAYMENT"))
 
                 // order-payment
                 .route("team3-order-payment",
-                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**", "/api/carts/**")
+                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
                                 .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
                 // booksearch
                 .route("team3-booksearch",
-                        p -> p.path("/api/books/**", "/api/search/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
+                        p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**")
+//                                .filters(f -> f.filter(
+//                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(BOOKSEARCH_LB_URL))
                 .build();
 
