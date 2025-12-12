@@ -8,6 +8,7 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @RequiredArgsConstructor
 @Configuration
@@ -25,6 +26,7 @@ public class RouterLocateConfig {
     private static final String BOOKSEARCH_LB_URL = "lb://TEAM3-BOOKSEARCH";
 
     @Bean
+    @Primary
     public RedisRateLimiter commonRateLimiter() {
         return new RedisRateLimiter(10, 20);
     }
