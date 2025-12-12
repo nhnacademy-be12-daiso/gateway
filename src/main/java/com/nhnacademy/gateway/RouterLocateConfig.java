@@ -75,12 +75,12 @@ public class RouterLocateConfig {
                                 .uri(COUPON_LB_URL))
 
                 .route("team3-order-payment-public",
-                        p -> p.path("/api/carts/**")
+                        p -> p.path("/api/carts/**", "/api/orders/**")
                                 .uri("lb://TEAM3-ORDER-PAYMENT"))
 
                 // order-payment
                 .route("team3-order-payment",
-                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
+                        p -> p.path("/api/order-payment/**", "/api/payments/**")
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(
                                                 new AuthorizationHeaderFilter.Config(ROLE_USER))))
