@@ -70,9 +70,10 @@ class AuthorizationHeaderFilterTest {
 
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        given(valueOperations.get("blacklist:" + VALID_TOKEN)).willReturn(null);
+        given(stringRedisTemplate.hasKey("blacklist:" + VALID_TOKEN)).willReturn(false);
         given(jwtUtil.isTokenValid(VALID_TOKEN)).willReturn(true);
-        given(jwtUtil.getLoginId(VALID_TOKEN)).willReturn(USER_ID);
+        given(jwtUtil.getUserId(VALID_TOKEN)).willReturn(USER_ID);
+        given(jwtUtil.getLoginId(VALID_TOKEN)).willReturn("testLoginId");
         given(jwtUtil.getRole(VALID_TOKEN)).willReturn(ROLE);
 
         given(chain.filter(any(ServerWebExchange.class))).willAnswer(invocation -> {
@@ -81,7 +82,7 @@ class AuthorizationHeaderFilterTest {
 
             // X-User-Id와 X-Role 헤더가 추가되었는지 검증
             assertThat(modifiedRequest.getHeaders().getFirst("X-User-Id")).isEqualTo(USER_ID);
-            assertThat(modifiedRequest.getHeaders().getFirst("X-Role")).isEqualTo(ROLE);
+            assertThat(modifiedRequest.getHeaders().getFirst("X-Role")).isEqualTo("ROLE_" + ROLE);
 
             return Mono.empty();
         });
@@ -95,6 +96,7 @@ class AuthorizationHeaderFilterTest {
                 .verifyComplete();
 
         verify(jwtUtil).isTokenValid(VALID_TOKEN);
+        verify(jwtUtil).getUserId(VALID_TOKEN);
         verify(jwtUtil).getLoginId(VALID_TOKEN);
         verify(jwtUtil).getRole(VALID_TOKEN);
     }
@@ -110,9 +112,10 @@ class AuthorizationHeaderFilterTest {
 
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        given(valueOperations.get("blacklist:" + VALID_TOKEN)).willReturn(null);
+        given(stringRedisTemplate.hasKey("blacklist:" + VALID_TOKEN)).willReturn(false);
         given(jwtUtil.isTokenValid(VALID_TOKEN)).willReturn(true);
-        given(jwtUtil.getLoginId(VALID_TOKEN)).willReturn(USER_ID);
+        given(jwtUtil.getUserId(VALID_TOKEN)).willReturn(USER_ID);
+        given(jwtUtil.getLoginId(VALID_TOKEN)).willReturn("testLoginId");
         given(jwtUtil.getRole(VALID_TOKEN)).willReturn(ROLE);
 
         given(chain.filter(any(ServerWebExchange.class))).willAnswer(invocation -> {
@@ -121,7 +124,7 @@ class AuthorizationHeaderFilterTest {
 
             // X-User-Id와 X-Role 헤더가 추가되었는지 검증
             assertThat(modifiedRequest.getHeaders().getFirst("X-User-Id")).isEqualTo(USER_ID);
-            assertThat(modifiedRequest.getHeaders().getFirst("X-Role")).isEqualTo(ROLE);
+            assertThat(modifiedRequest.getHeaders().getFirst("X-Role")).isEqualTo("ROLE_" + ROLE);
 
             return Mono.empty();
         });
@@ -168,7 +171,7 @@ class AuthorizationHeaderFilterTest {
 
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        given(valueOperations.get("blacklist:" + VALID_TOKEN)).willReturn("logout");
+        given(stringRedisTemplate.hasKey("blacklist:" + VALID_TOKEN)).willReturn(true);
 
         // when
         Mono<Void> result = filter.apply(new AuthorizationHeaderFilter.Config("ROLE_USER"))
@@ -193,7 +196,7 @@ class AuthorizationHeaderFilterTest {
 
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        given(valueOperations.get("blacklist:" + VALID_TOKEN)).willReturn(null);
+        given(stringRedisTemplate.hasKey("blacklist:" + VALID_TOKEN)).willReturn(false);
         given(jwtUtil.isTokenValid(VALID_TOKEN)).willReturn(false);
 
         // when
@@ -213,6 +216,7 @@ class AuthorizationHeaderFilterTest {
     void verifyXUserIdValue() {
         // given
         String expectedUserId = "123";
+        String expectedLoginId = "testLogin";
         String expectedRole = "ADMIN";
 
         MockServerHttpRequest request = MockServerHttpRequest
@@ -222,9 +226,10 @@ class AuthorizationHeaderFilterTest {
 
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        given(valueOperations.get(anyString())).willReturn(null);
+        given(stringRedisTemplate.hasKey(anyString())).willReturn(false);
         given(jwtUtil.isTokenValid(VALID_TOKEN)).willReturn(true);
-        given(jwtUtil.getLoginId(VALID_TOKEN)).willReturn(expectedUserId);
+        given(jwtUtil.getUserId(VALID_TOKEN)).willReturn(expectedUserId);
+        given(jwtUtil.getLoginId(VALID_TOKEN)).willReturn(expectedLoginId);
         given(jwtUtil.getRole(VALID_TOKEN)).willReturn(expectedRole);
 
         given(chain.filter(any(ServerWebExchange.class))).willAnswer(invocation -> {
@@ -233,10 +238,12 @@ class AuthorizationHeaderFilterTest {
 
             // 정확한 값이 전달되는지 검증
             String actualUserId = modifiedRequest.getHeaders().getFirst("X-User-Id");
+            String actualLoginId = modifiedRequest.getHeaders().getFirst("X-Login-Id");
             String actualRole = modifiedRequest.getHeaders().getFirst("X-Role");
 
             assertThat(actualUserId).isEqualTo(expectedUserId);
-            assertThat(actualRole).isEqualTo(expectedRole);
+            assertThat(actualLoginId).isEqualTo(expectedLoginId);
+            assertThat(actualRole).isEqualTo("ROLE_" + expectedRole);
 
             return Mono.empty();
         });

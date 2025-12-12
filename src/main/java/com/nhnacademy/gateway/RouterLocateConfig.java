@@ -88,7 +88,7 @@ public class RouterLocateConfig {
 
                 // booksearch
                 .route("team3-booksearch",
-                        p -> p.path("/api/books/**", "/api/search/**")
+                        p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**")
 //                                .filters(f -> f.filter(
 //                                        authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(BOOKSEARCH_LB_URL))
