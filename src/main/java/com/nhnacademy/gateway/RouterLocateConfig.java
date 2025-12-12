@@ -111,6 +111,12 @@ public class RouterLocateConfig {
                                 .uri(ORDER_PAYMENT_LB_URL))
 
                 // 8. [Protected] 주문/결제
+                // 비회원 결제
+                .route("team3-guest-payment",
+                        p -> p.path("/api/guest/payments/**")
+                                .uri(ORDER_PAYMENT_LB_URL))
+
+                // 회원 주문/결제
                 .route("team3-order-payment",
                         p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
                                 .filters(f -> f
@@ -131,6 +137,22 @@ public class RouterLocateConfig {
                 .route("zipkin-ui",
                         p -> p.path("/zipkin/**")
                             .uri("http://zipkin:9411"))
+
+                // 10. [Protected] 배송비 정책
+                .route("team3-delivery",
+                        p -> p.path("/api/admin/deliveries/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                .uri(ORDER_PAYMENT_LB_URL))
+
+                // 11. [Protected] 포장 정책
+                .route("team3-packaging",
+                        p -> p.path("/api/admin/packagings/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                .uri(ORDER_PAYMENT_LB_URL))
 
                 .build();
     }
