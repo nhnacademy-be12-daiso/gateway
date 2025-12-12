@@ -7,7 +7,7 @@ spring:
       host: ${SPRING_DATA_REDIS_HOST}
       port: ${SPRING_DATA_REDIS_PORT}
       password: ${SPRING_DATA_REDIS_PASSWORD}
-      database: ${AUTH_SPRING_DATA_REDIS_DATABASE:370}
+      database: ${AUTH_SPRING_DATA_REDIS_DATABASE}
 
   cloud:
     gateway:
@@ -37,6 +37,12 @@ jwt:
   header: Authorization
 
 management:
+  tracing:
+    sampling:
+      probability: 0.1
+  zipkin:
+    tracing:
+      endpoint: ${MANAGEMENT_ZIPKIN_TRACING_ENDPOINT}
   endpoints:
     web:
       exposure:
