@@ -51,6 +51,23 @@ public class RouterLocateConfig {
                                         authorizationHeaderFilter.apply(
                                                 new AuthorizationHeaderFilter.Config(ROLE_USER))))
                                 .uri(USER_LB_URL))
+
+                // order-payment admin deliveryPolicy
+                .route("team3-order-payment-admin-delivery",
+                        p -> p.path("/api/admin/deliveries/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                .uri(ORDER_PAYMENT_LB_URL))
+
+                // order-payment admin packaging
+                .route("team3-order-payment-admin-packaging",
+                        p -> p.path("/api/admin/packagings/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                .uri(ORDER_PAYMENT_LB_URL))
+
                 .route("team3-user-admin",
                         p -> p.path("/api/admin/**")
                                 .filters(f -> f.filter(
@@ -77,6 +94,11 @@ public class RouterLocateConfig {
                 .route("team3-order-payment-public",
                         p -> p.path("/api/carts/**", "/api/orders/prepare")
                                 .uri("lb://TEAM3-ORDER-PAYMENT"))
+
+                // guest-payment
+                .route("team3-guest-payment",
+                        p -> p.path("/api/guest/payments/**")
+                                .uri(ORDER_PAYMENT_LB_URL))
 
                 // order-payment
                 .route("team3-order-payment",

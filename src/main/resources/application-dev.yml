@@ -18,20 +18,6 @@ spring:
               enabled: true
               lower-case-service-id: true
 
-      routes:
-        - id: payment-route
-          # Eureka 통해 라우팅 (서비스 이름 기준)
-          uri: lb://team3-order-payment
-          predicates:
-            - Path=/api/payments/**
-          filters:
-            - name: AuthorizationHeaderFilter # 회원용
-
-        - id: guest-payment-route
-          uri: lb://team3-order-payment
-          predicates:
-            - Path=/api/guest/payments/** # 비회원용
-
 eureka:
   instance:
     prefer-ip-address: true
