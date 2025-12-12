@@ -127,6 +127,11 @@ public class RouterLocateConfig {
                                         .setRateLimiter(searchRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(BOOKSEARCH_LB_URL))
+
+                .route("zipkin-ui",
+                        p -> p.path("/zipkin/**")
+                            .uri("http://zipkin:9411"))
+
                 .build();
     }
 }
