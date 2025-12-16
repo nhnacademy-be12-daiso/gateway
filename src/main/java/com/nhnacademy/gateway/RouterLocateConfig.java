@@ -1,3 +1,15 @@
+/*
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + Copyright 2025. NHN Academy Corp. All rights reserved.
+ * + * While every precaution has been taken in the preparation of this resource,  assumes no
+ * + responsibility for errors or omissions, or for damages resulting from the use of the information
+ * + contained herein
+ * + No part of this resource may be reproduced, stored in a retrieval system, or transmitted, in any
+ * + form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the
+ * + prior written permission.
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
+
 package com.nhnacademy.gateway;
 
 import com.nhnacademy.gateway.filter.AuthorizationHeaderFilter;
@@ -44,7 +56,7 @@ public class RouterLocateConfig {
     @Bean
     public RouteLocator myRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                // 1. [Public] 인증 서비스
+                // [Public] 인증 서비스
                 .route("team3-auth",
                         p -> p.path("/auth/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
@@ -52,7 +64,7 @@ public class RouterLocateConfig {
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(AUTH_LB_URL))
 
-                // 2. [Public] 유저 서비스 공개 API
+                // [Public] 유저 서비스 공개 API
                 .route("team3-user-public",
                         p -> p.path("/api/users/signup", "/api/users/check-id",
                                         "/api/users/find-id", "/api/users/find-password")
@@ -61,48 +73,68 @@ public class RouterLocateConfig {
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL))
 
-                // 3. [Protected] 유저 서비스
+                // [Protected] 유저 서비스
                 .route("team3-user-protected",
                         p -> p.path("/api/users/**")
                                 .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER)))
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER)))
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(strictRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL))
 
-                // 4. [Protected] 관리자 API
+                // [Protected] 배송비 정책
+                .route("team3-delivery",
+                        p -> p.path("/api/admin/deliveries/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                .uri(ORDER_PAYMENT_LB_URL))
+
+                // [Protected] 포장 정책
+                .route("team3-packaging",
+                        p -> p.path("/api/admin/packagings/**")
+                                .filters(f -> f.filter(
+                                        authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
+                                .uri(ORDER_PAYMENT_LB_URL))
+
+                // [Protected] 관리자 API
                 .route("team3-user-admin",
                         p -> p.path("/api/admin/**")
                                 .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_ADMIN)))
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN)))
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(commonRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL)
                 )
 
-                // 5. [Protected] 쿠폰 관리 (ROLE_ADMIN)
+                // [Protected] 쿠폰 관리 (ROLE_ADMIN)
                 .route("team3-coupon-protected-admin",
                         p -> p.path("/api/coupons/policies/**")
                                 .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_ADMIN)))
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN)))
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(commonRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(COUPON_LB_URL))
 
-                // 6. [Protected] 쿠폰 발급/사용 (ROLE_USER)
+                // [Protected] 쿠폰 발급/사용 (ROLE_USER)
                 .route("team3-coupon-public",
                         p -> p.path("/api/coupons/**")
                                 .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER)))
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER)))
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(strictRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(COUPON_LB_URL))
 
-                // 7. [Public] 장바구니/주문 준비
+                // [Public] 장바구니/주문 준비
                 .route("team3-order-payment-public",
                         p -> p.path("/api/carts/**", "/api/orders/prepare")
                                 .filters(f -> f.requestRateLimiter(c -> c
@@ -110,7 +142,7 @@ public class RouterLocateConfig {
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
-                // 8. [Protected] 주문/결제
+                // [Protected] 주문/결제
                 // 비회원 결제
                 .route("team3-guest-payment",
                         p -> p.path("/api/guest/payments/**")
@@ -120,13 +152,14 @@ public class RouterLocateConfig {
                 .route("team3-order-payment",
                         p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
                                 .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config(ROLE_USER)))
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER)))
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(strictRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
-                // 9. [Public] 도서 검색
+                // [Public] 도서 검색
                 .route("team3-booksearch",
                         p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
@@ -136,23 +169,7 @@ public class RouterLocateConfig {
 
                 .route("zipkin-ui",
                         p -> p.path("/zipkin/**")
-                            .uri("http://zipkin:9411"))
-
-                // 10. [Protected] 배송비 정책
-                .route("team3-delivery",
-                        p -> p.path("/api/admin/deliveries/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // 11. [Protected] 포장 정책
-                .route("team3-packaging",
-                        p -> p.path("/api/admin/packagings/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
-                                .uri(ORDER_PAYMENT_LB_URL))
+                                .uri("http://zipkin:9411"))
 
                 .build();
     }
