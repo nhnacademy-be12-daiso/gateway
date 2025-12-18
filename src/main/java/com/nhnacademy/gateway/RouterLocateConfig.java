@@ -161,12 +161,12 @@ public class RouterLocateConfig {
 
                 // [Public] 도서 검색
                 .route("team3-booksearch",
-                        p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**")
+                        p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**",
+                                        "/api/v2/books/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
                                         .setRateLimiter(searchRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(BOOKSEARCH_LB_URL))
-
                 .route("zipkin-ui",
                         p -> p.path("/zipkin/**")
                                 .uri("http://zipkin:9411"))
