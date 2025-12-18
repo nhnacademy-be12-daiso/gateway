@@ -134,29 +134,13 @@ public class RouterLocateConfig {
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(COUPON_LB_URL))
 
-                // [Public] 장바구니/주문 준비
+                // [Public] 장바구니/주문/결제
                 .route("team3-order-payment-public",
-                        p -> p.path("/api/carts/**", "/api/orders/prepare")
+                        p -> p.path("/api/guest/**", "/api/carts/**",
+                                        "/api/orders/**", "/api/payments/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
                                         .setRateLimiter(commonRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // [Protected] 주문/결제
-                // 비회원 결제
-                .route("team3-guest-payment",
-                        p -> p.path("/api/guest/payments/**")
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // 회원 주문/결제
-                .route("team3-order-payment",
-                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
-                                .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_USER)))
-                                        .requestRateLimiter(c -> c
-                                                .setRateLimiter(strictRateLimiter())
-                                                .setKeyResolver(userKeyResolver)))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
                 // [Public] 도서 검색
