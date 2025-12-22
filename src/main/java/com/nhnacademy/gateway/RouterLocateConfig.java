@@ -137,9 +137,12 @@ public class RouterLocateConfig {
                 .route("team3-order-payment-public",
                         p -> p.path("/api/guest/**", "/api/carts/**",
                                         "/api/orders/**", "/api/payments/**", "/payments/**")
-                                .filters(f -> f.requestRateLimiter(c -> c
-                                        .setRateLimiter(commonRateLimiter())
-                                        .setKeyResolver(userKeyResolver)))
+                                .filters(f -> f
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_USER)))
+                                        .requestRateLimiter(c -> c
+                                                .setRateLimiter(commonRateLimiter())
+                                                .setKeyResolver(userKeyResolver)))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
                 // [Public] 도서 검색
