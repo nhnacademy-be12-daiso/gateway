@@ -136,7 +136,7 @@ public class RouterLocateConfig {
                 // [Public] 장바구니/주문/결제
                 .route("team3-order-payment-public",
                         p -> p.path("/api/guest/**", "/api/carts/**",
-                                        "/api/orders/**", "/api/payments/**", "/payments/**")
+                                        "/api/orders/**", "/api/payments/**")
                                 .filters(f -> f
                                         .filter(authorizationHeaderFilter.apply(
                                                 new AuthorizationHeaderFilter.Config(ROLE_USER)))
