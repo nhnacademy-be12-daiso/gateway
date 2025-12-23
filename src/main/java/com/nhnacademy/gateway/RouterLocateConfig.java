@@ -84,17 +84,6 @@ public class RouterLocateConfig {
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL))
 
-                // [Protected] 관리자 API
-                .route("team3-user-admin",
-                        p -> p.path("/api/admin/**")
-                                .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN)))
-                                        .requestRateLimiter(c -> c
-                                                .setRateLimiter(commonRateLimiter())
-                                                .setKeyResolver(userKeyResolver)))
-                                .uri(USER_LB_URL))
-
                 // [Protected] 배송비 정책
                 .route("team3-delivery",
                         p -> p.path("/api/admin/deliveries/**")
@@ -110,6 +99,17 @@ public class RouterLocateConfig {
                                         authorizationHeaderFilter.apply(
                                                 new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
                                 .uri(ORDER_PAYMENT_LB_URL))
+
+                // [Protected] 관리자 API
+                .route("team3-user-admin",
+                        p -> p.path("/api/admin/**")
+                                .filters(f -> f
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN)))
+                                        .requestRateLimiter(c -> c
+                                                .setRateLimiter(commonRateLimiter())
+                                                .setKeyResolver(userKeyResolver)))
+                                .uri(USER_LB_URL))
 
                 // [Protected] 쿠폰 관리 (ROLE_ADMIN)
                 .route("team3-coupon-protected-admin",
