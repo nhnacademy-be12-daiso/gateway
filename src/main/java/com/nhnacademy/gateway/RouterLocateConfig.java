@@ -130,7 +130,7 @@ public class RouterLocateConfig {
 
                 // [Protected] 장바구니/주문/결제 (ROLE_USER)
                 .route("team3-order-payment-protected",
-                        p -> p.path("/api/carts/**", "/api/orders/**", "/api/payments/**", "api/guest/**")
+                        p -> p.path("/api/carts/**", "/api/orders/**", "/api/payments/**", "/api/guest/**")
                                 .filters(f -> f
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(strictRateLimiter())
