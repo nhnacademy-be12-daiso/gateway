@@ -84,17 +84,12 @@ public class RouterLocateConfig {
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL))
 
-                // [Protected] 배송비 정책
-                .route("team3-delivery",
-                        p -> p.path("/api/admin/deliveries/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // [Protected] 포장 정책
-                .route("team3-packaging",
-                        p -> p.path("/api/admin/packagings/**")
+                // [Protected] 배송비, 포장 정책
+                .route("team3-order-payment-admin-policies",
+                        p -> p.path(
+                                        "/api/admin/deliveries/**",
+                                        "/api/admin/packagings/**"
+                                )
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(
                                                 new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
