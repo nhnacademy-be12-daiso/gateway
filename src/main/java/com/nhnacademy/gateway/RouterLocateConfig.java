@@ -140,7 +140,7 @@ public class RouterLocateConfig {
                 // [Public] 도서 검색
                 .route("team3-booksearch",
                         p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**",
-                                        "/api/v2/books/**")
+                                        "/api/v2/books/**", "/api/v2/likes/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
                                         .setRateLimiter(searchRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
