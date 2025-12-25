@@ -84,17 +84,12 @@ public class RouterLocateConfig {
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL))
 
-                // [Protected] 배송비 정책
-                .route("team3-delivery",
-                        p -> p.path("/api/admin/deliveries/**")
-                                .filters(f -> f.filter(
-                                        authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // [Protected] 포장 정책
-                .route("team3-packaging",
-                        p -> p.path("/api/admin/packagings/**")
+                // [Protected] 배송비, 포장 정책
+                .route("team3-order-payment-admin-policies",
+                        p -> p.path(
+                                        "/api/admin/deliveries/**",
+                                        "/api/admin/packagings/**"
+                                )
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(
                                                 new AuthorizationHeaderFilter.Config(ROLE_ADMIN))))
@@ -109,8 +104,7 @@ public class RouterLocateConfig {
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(commonRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
-                                .uri(USER_LB_URL)
-                )
+                                .uri(USER_LB_URL))
 
                 // [Protected] 쿠폰 관리 (ROLE_ADMIN)
                 .route("team3-coupon-protected-admin",
@@ -134,26 +128,10 @@ public class RouterLocateConfig {
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(COUPON_LB_URL))
 
-                // [Public] 장바구니/주문 준비
-                .route("team3-order-payment-public",
-                        p -> p.path("/api/carts/**", "/api/orders/prepare")
-                                .filters(f -> f.requestRateLimiter(c -> c
-                                        .setRateLimiter(commonRateLimiter())
-                                        .setKeyResolver(userKeyResolver)))
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // [Protected] 주문/결제
-                // 비회원 결제
-                .route("team3-guest-payment",
-                        p -> p.path("/api/guest/payments/**")
-                                .uri(ORDER_PAYMENT_LB_URL))
-
-                // 회원 주문/결제
-                .route("team3-order-payment",
-                        p -> p.path("/api/order-payment/**", "/api/orders/**", "/api/payments/**")
+                // [Protected] 장바구니/주문/결제 (ROLE_USER)
+                .route("team3-order-payment-protected",
+                        p -> p.path("/api/carts/**", "/api/orders/**", "/api/payments/**", "/api/guest/**")
                                 .filters(f -> f
-                                        .filter(authorizationHeaderFilter.apply(
-                                                new AuthorizationHeaderFilter.Config(ROLE_USER)))
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(strictRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
@@ -167,6 +145,7 @@ public class RouterLocateConfig {
                                         .setRateLimiter(searchRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(BOOKSEARCH_LB_URL))
+
                 .route("zipkin-ui",
                         p -> p.path("/zipkin/**")
                                 .uri("http://zipkin:9411"))
