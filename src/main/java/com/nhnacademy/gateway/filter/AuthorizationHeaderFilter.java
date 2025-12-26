@@ -1,3 +1,15 @@
+/*
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + Copyright 2025. NHN Academy Corp. All rights reserved.
+ * + * While every precaution has been taken in the preparation of this resource,  assumes no
+ * + responsibility for errors or omissions, or for damages resulting from the use of the information
+ * + contained herein
+ * + No part of this resource may be reproduced, stored in a retrieval system, or transmitted, in any
+ * + form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the
+ * + prior written permission.
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ */
+
 package com.nhnacademy.gateway.filter;
 
 import com.nhnacademy.gateway.jwt.properties.JwtProperties;
@@ -34,9 +46,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     @NoArgsConstructor
     public static class Config {
         private String role;
+        private boolean isGuest = false;
 
         public Config(String role) {
             this.role = role;
+        }
+
+        public Config(String role, boolean isGuest) {
+            this.role = role;
+            this.isGuest = isGuest;
         }
 
         public String getRole() {
@@ -52,6 +70,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
                 String token = resolveToken(request);
                 if (token == null) {
+                    if (config.isGuest) {
+                        return chain.filter(exchange);
+                    }
                     return onError(exchange, "No authorization token", HttpStatus.UNAUTHORIZED);
                 }
 
@@ -72,13 +93,17 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     userRole = "ROLE_" + userRole;
                 }
 
-                if (config.getRole() != null) {
-                    String requiredRole = config.getRole();
-                    // 요구되는 role에도 ROLE_ 접두사가 없으면 추가
-                    if (!requiredRole.startsWith("ROLE_")) {
-                        requiredRole = "ROLE_" + requiredRole;
-                    }
+                String requiredRole = config.getRole();
+                if (requiredRole != null && !requiredRole.startsWith("ROLE_")) {
+                    requiredRole = "ROLE_" + requiredRole;
+                }
 
+                if ("ROLE_DORMANT".equals(userRole) && !"ROLE_DORMANT".equals(requiredRole)) {
+                    log.warn("[Gateway] 휴면 회원 접근 차단: {}", request.getURI());
+                    return onError(exchange, "Forbidden: Dormant account", HttpStatus.FORBIDDEN);
+                }
+
+                if (requiredRole != null) {
                     // ADMIN은 USER 권한도 포함 (상위 권한)
                     boolean hasPermission = userRole != null && (
                             userRole.equals(requiredRole) ||
