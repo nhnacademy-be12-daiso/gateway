@@ -36,6 +36,7 @@ public class RouterLocateConfig {
     private static final String COUPON_LB_URL = "lb://TEAM3-COUPON";
     private static final String ORDER_PAYMENT_LB_URL = "lb://TEAM3-ORDER-PAYMENT";
     private static final String BOOKSEARCH_LB_URL = "lb://TEAM3-BOOKSEARCH";
+    private static final String BOOKSEARCHWORKER_LB_URL = "lb://TEAM3-BOOKSEARCH-WORKER";
 
     @Bean
     @Primary
@@ -137,14 +138,22 @@ public class RouterLocateConfig {
                                                 .setKeyResolver(userKeyResolver)))
                                 .uri(ORDER_PAYMENT_LB_URL))
 
-                // [Public] 도서 검색
+                // [Public] 도서
                 .route("team3-booksearch",
-                        p -> p.path("/api/books/**", "/api/search/**", "/api/reviews/**", "/api/likes/**",
-                                        "/api/v2/books/**", "/api/v2/likes/**")
+                        p -> p.path("/api/books/**", "/api/reviews/**", "/api/likes/**",
+                                        "/api/v2/books/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
                                         .setRateLimiter(searchRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(BOOKSEARCH_LB_URL))
+
+                // [Public] 도서 검색
+                .route("team3-booksearch-worker",
+                        p -> p.path("/api/search/**")
+                                .filters(f -> f.requestRateLimiter(c -> c
+                                        .setRateLimiter(commonRateLimiter())
+                                        .setKeyResolver(userKeyResolver)))
+                                .uri(BOOKSEARCHWORKER_LB_URL))
 
                 .route("zipkin-ui",
                         p -> p.path("/zipkin/**")
