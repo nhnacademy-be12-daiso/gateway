@@ -74,6 +74,17 @@ public class RouterLocateConfig {
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(USER_LB_URL))
 
+                // [Protected] 휴면 계정
+                .route("team3-user-activate",
+                        p -> p.path("/api/users/activate/**") // 휴면 해제 API 경로
+                                .filters(f -> f
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config("DORMANT")))
+                                        .requestRateLimiter(c -> c
+                                                .setRateLimiter(commonRateLimiter())
+                                                .setKeyResolver(userKeyResolver)))
+                                .uri(USER_LB_URL))
+
                 // [Protected] 유저 서비스
                 .route("team3-user-protected",
                         p -> p.path("/api/users/**")
@@ -133,6 +144,10 @@ public class RouterLocateConfig {
                 .route("team3-order-payment-protected",
                         p -> p.path("/api/carts/**", "/api/orders/**", "/api/payments/**", "/api/guest/**")
                                 .filters(f -> f
+                                        // 수정: 필터를 적용하되 비회원(Guest) 허용 설정 추가
+                                        .filter(authorizationHeaderFilter.apply(
+                                                new AuthorizationHeaderFilter.Config(null,
+                                                        true))) // role은 null, isGuest는 true
                                         .requestRateLimiter(c -> c
                                                 .setRateLimiter(strictRateLimiter())
                                                 .setKeyResolver(userKeyResolver)))
