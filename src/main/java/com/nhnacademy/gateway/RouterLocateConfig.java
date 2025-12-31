@@ -100,7 +100,8 @@ public class RouterLocateConfig {
                 .route("team3-order-payment-admin-policies",
                         p -> p.path(
                                         "/api/admin/deliveries/**",
-                                        "/api/admin/packagings/**"
+                                        "/api/admin/packagings/**",
+                                        "/api/admin/orders/**"
                                 )
                                 .filters(f -> f.filter(
                                         authorizationHeaderFilter.apply(
@@ -142,7 +143,7 @@ public class RouterLocateConfig {
 
                 // [Protected] 장바구니/주문/결제 (ROLE_USER)
                 .route("team3-order-payment-protected",
-                        p -> p.path("/api/carts/**", "/api/orders/**", "/api/payments/**", "/api/guest/**")
+                        p -> p.path("/api/carts/**", "/api/orders/**", "/api/payments/**", "/api/guest/**", "/api/subscribe/**")
                                 .filters(f -> f
                                         // 수정: 필터를 적용하되 비회원(Guest) 허용 설정 추가
                                         .filter(authorizationHeaderFilter.apply(
