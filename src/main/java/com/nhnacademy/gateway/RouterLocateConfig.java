@@ -165,9 +165,9 @@ public class RouterLocateConfig {
 
                 // [Public] 도서 검색
                 .route("team3-booksearch-worker",
-                        p -> p.path("/api/search/**")
+                        p -> p.path("/api/search/basic","/api/search/ai","/api/search/**")
                                 .filters(f -> f.requestRateLimiter(c -> c
-                                        .setRateLimiter(commonRateLimiter())
+                                        .setRateLimiter(searchRateLimiter())
                                         .setKeyResolver(userKeyResolver)))
                                 .uri(BOOKSEARCHWORKER_LB_URL))
 
